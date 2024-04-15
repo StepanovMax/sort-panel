@@ -1,19 +1,23 @@
 <template>
   <main>
-    <CardList v-for="(item, index) in CardListOptions" :key="index" :options="item" />
+    <CardsColumn
+      v-for="(item, index) in CardsListOptions"
+      :key="index"
+      :options="item"
+    />
   </main>
 </template>
 
 <script setup>
   import { ref, provide } from 'vue';
   import axios from 'axios';
-  import CardList from './components/CardList.vue';
+  import CardsColumn from './components/CardsColumn.vue';
 
   const firstList = ref([]);
   const secondList = ref([]);
   const lastList = ref([]);
 
-  const CardListOptions = ref([
+  const CardsListOptions = ref([
     {
       color: '#0aa6e362',
       title: 'Необработанные',
@@ -51,8 +55,13 @@
 </script>
 
 <style scoped>
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+
   main {
-    margin: 5% 0;
+    margin: 10px 0;
     display: flex;
     justify-content: center;
     gap: 5%;

@@ -1,44 +1,54 @@
 <template>
-  <section
-    :style="`background: ${options.color}`"
-    @drop="onDrop($event, options.id)"
-    @dragover.prevent
-    @dragenter.prevent>
-    <div class="title">
-      <h2>
-        {{ options.title }}
-      </h2>
-      <div class="counter">
-        <span>{{ cards.length }}</span>
+  <div class="cards-list">
+    <section
+      class="cards-list__section"
+      :style="`background: ${options.color}`"
+      @drop="onDrop($event, options.id)"
+      @dragover.prevent
+      @dragenter.prevent
+    >
+      <div class="cards-list__title">
+        <h2>
+          {{ options.title }}
+        </h2>
+        <div class="cards-list__counter">
+          <span>{{ cards.length }}</span>
+        </div>
       </div>
-    </div>
-    <v-btn
-      icon="mdi-plus"
-      variant="tonal"
-      class="mt-5"
-      color="white"
-      @click="isNewCardDialogOpen = true" />
 
-    <CardItem
-      v-for="(card, index) in cards"
-      draggable="true"
-      :key="index"
-      :card="card"
-      :options="props.options"
-      @delete-card="deleteCard(card.id)"
-      @dragstart="onDragStart($event, card)" />
+      <v-btn
+        icon="mdi-plus"
+        variant="tonal"
+        class="mt-5"
+        color="white"
+        @click="isNewCardDialogOpen = true"
+      />
 
-    <CardForm
-      title="Добавление новой карточки"
-      v-model="isNewCardDialogOpen"
-      :form="form"
-      @save-card="addCard"
-      @close-form="isNewCardDialogOpen = false" />
-  </section>
+      <div class="cards-list-main">
+        <CardItem
+          v-for="(card, index) in cards"
+          draggable="true"
+          :key="index"
+          :card="card"
+          :options="props.options"
+          @delete-card="deleteCard(card.id)"
+          @dragstart="onDragStart($event, card)"
+        />
+      </div>
+
+      <CardForm
+        title="Добавление новой карточки"
+        v-model="isNewCardDialogOpen"
+        :form="form"
+        @save-card="addCard"
+        @close-form="isNewCardDialogOpen = false"
+      />
+    </section>
+  </div>
 </template>
 
 <script setup>
-  import { ref, inject } from 'vue';
+  import { ref, inject, reactive, readonly } from 'vue';
   import CardItem from './CardItem.vue';
   import CardForm from './CardForm.vue';
 
@@ -83,14 +93,17 @@
     cards.value.unshift(form.value);
     isNewCardDialogOpen.value = false;
   }
+
   function deleteCard(id) {
     cards.value = cards.value.filter((card) => card.id != id);
   }
+
   function onDragStart(event, item) {
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('itemId', item.id.toString());
   }
+
   function onDrop(event, optionsId) {
     const itemId = parseInt(event.dataTransfer.getData('itemId'));
     let otherLists = [];
@@ -132,32 +145,47 @@
 </script>
 
 <style lang="scss" scoped>
-  section {
-    padding: 10px;
-    width: 400px;
-    min-height: 500px;
-    height: fit-content;
-    border-radius: 10px;
+  .cards-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    .title {
+    gap: 20px;
+
+    &__section {
+      padding: 10px;
+      width: 400px;
+      min-height: 500px;
+      height: fit-content;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: v-bind('options.color');
+    }
+
+    &__title {
       padding-bottom: 10px;
       width: 90%;
       display: flex;
       align-items: center;
       justify-content: center;
       border-bottom: 2px solid white;
-      .counter {
-        margin-left: 10px;
-        background: white;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    }
+
+    &__counter {
+      margin-left: 10px;
+      background: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &-main {
+      height: calc(100vh - 240px);
+      overflow: auto;
+      padding: 0 10px;
     }
   }
 </style>
